@@ -1,67 +1,121 @@
 require("dotenv").config();
-let keys = require("./keys");
-let moment = require('moment');
-let request = require('request');
-let Spotify = require('node-spotify-api');
-let spotify = new Spotify(keys.spotify);
-let firstInput = process.argv[2];
+const fs = require('fs');
+const keys = require("./keys");
+const moment = require('moment');
+const request = require('request');
+const Spotify = require('node-spotify-api');
+const spotify = new Spotify(keys.spotify);
 
+const command = process.argv[2];
+const acceptableCommands = ["concert-this", "spotify-this-song", "movie-this", "do-what-it-says"];
+if (!acceptableCommands.includes(command)) {
+    console.log(`Command not recognized. Acceptable Commands are: \n${acceptableCommands[0]} \n${acceptableCommands[1]} \n${acceptableCommands[2]} \n${acceptableCommands[3]}`)
+}
 
-if (firstInput === "concert-this") {
-    let artist = '';
-    for (let i = 3; i < process.argv.length; i++) {
-        if (i > 3) {
-            artist = artist.concat('%20')
+const processInput = (divider, input) => {
+    let outputString = input[3];
+
+    if (input.length === 4) {
+        return outputString;
+    } else {
+        for (let i = 4; i < input.length; i++) {
+            outputString += (divider + input[i]);
         }
-        artist = artist.concat(process.argv[i])
+        return outputString;
     }
+}
+
+if (command === "concert-this") {
+    let artist = processInput('%20', process.argv);
     let queryUrl = `https://rest.bandsintown.com/artists/${artist}/events?app_id=codingbootcamp`
 
     request(queryUrl, function (error, response, body) {
+        if (error) {
+            console.log("Error. Please try again")
+            return;
+        }
+
         let bandInfo = JSON.parse(body);
-        let event = {};
         if (!bandInfo[0]) {
             console.log("No upcoming Events")
             return;
-        } else {
-            for (let i = 0; i < bandInfo.length; i++) {
-                event = bandInfo[i]
-                console.log(`Venue: ${event.venue.name}`)
-                console.log(`Location: ${event.venue.city}, ${event.venue.region}`)
-                console.log(`Date: ${moment(event.datetime).format("MM/DD/YYYY")} \n`)
-            }
+        }
+
+        let event = {};
+        for (let i = 0; i < bandInfo.length; i++) {
+            event = bandInfo[i]
+            console.log(`Venue: ${event.venue.name}`)
+            console.log(`Location: ${event.venue.city}, ${event.venue.region}`)
+            console.log(`Date: ${moment(event.datetime).format("MM/DD/YYYY")} \n`)
         }
     });
-} else if (firstInput === "spotify-this-song") {
+} else if (command === "spotify-this-song") {
     let songName = '';
-    if (process.argv.length < 4) {
-        songName = "The+Sign"
-    } else {
-        for (let i = 3; i < process.argv.length; i++) {
-            if (i > 3) {
-                songName = songName.concat('+')
-            }
-            songName = songName.concat(process.argv[i])
-        }
-    }
-    spotify.search({
-        type: 'track',
-        query: songName
-        // limit: 1
-    }, function (err, data) {
-        if (err) {
-            return console.log('Error occurred: ' + err);
-        } else {
-            let song = data.tracks.items[0]
-            let artistString = [];
-            for (let i = 0; i < song.artists.length; i++) {
-                artistString.push(song.artists[i].name + '  ')
-            }
+    let artists = '';
+    let previewUrl = '';
+    let album = '';
 
-            console.log(`Artist(s): ${artistString}`)
-            console.log(`Song Name: ${song.name}`)
-            console.log(`Preview: ${song.preview_url}`)
-            console.log(`Album: ${song.album.name}`)
+    const findArtists = (response) => {
+        let allArtists = [];
+        for (let i = 0; i < response.artists.length; i++) {
+            allArtists.push(response.artists[i].name)
         }
+        return allArtists.join(', ')
+    };
+    const fillData = (data) => {
+        songName = data.name;
+        artists = findArtists(data);
+        previewUrl = data.preview_url;
+        album = data.album.name;
+    }
+    const printData = () => console.log(`Song Name: ${songName} \nArtist(s): ${artists} \nPreview URL: ${previewUrl} \nAlbum Title: ${album}`)
+
+    if (!process.argv[3]) {
+        spotify
+            .request("https://api.spotify.com/v1/tracks/3DYVWvPh3kGwPasp7yjahc")
+            .then((data) => {
+                fillData(data);
+                printData();
+            })
+    } else {
+        songName = processInput(' ', process.argv)
+        spotify
+            .search({
+                type: 'track',
+                query: songName,
+                limit: 1
+            })
+            .then(function (response) {
+                fillData(response.tracks.items[0]);
+                printData();
+            })
+    }
+
+
+
+} else if (command === "movie-this") {
+    let movieQuery = '';
+    if (!process.argv[3]){
+        movieQuery = `http://www.omdbapi.com/?apikey=trilogy&i=tt0485947`
+    } else {
+        movieQuery = `http://www.omdbapi.com/?apikey=trilogy&t=${processInput('+', process.argv)}`
+    }
+    
+    request(movieQuery, (error, response, body) => {
+        if (error) {
+            console.log("Error. Please try again")
+            return;
+        }
+        let movieInfo = JSON.parse(body);
+        console.log(`Title: ${movieInfo.Title}`)
+        console.log(`Year: ${movieInfo.Year}`)
+        console.log(`IMDb Rating: ${movieInfo.imdbRating}`)
+        console.log(`Rotten Tomatoes Rating: ${movieInfo.Ratings[1].Value}`)
+        console.log(`Country: ${movieInfo.Country}`)
+        console.log(`Language: ${movieInfo.Language}`)
+        console.log(`Plot: ${movieInfo.Plot}`)
+        console.log(`Actors: ${movieInfo.Actors}`)
     })
-} else if (firstInput === "movie-this") {}
+}else if (command === "do-what-it-says") {
+    
+}
