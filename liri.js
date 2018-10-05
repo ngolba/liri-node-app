@@ -1,17 +1,70 @@
 require("dotenv").config();
-let keys = require("./keys");
-console.log(keys.spotify)
 
-// var spotify = new Spotify(keys.spotify);
+let keys = require("./keys");
+
+let moment = require('moment');
+
+
+let request = require('request');
+
+let Spotify = require('node-spotify-api');
+
+let spotify = new Spotify(keys.spotify);
 
 let firstInput = process.argv[2];
 
 
 if (firstInput === "concert-this") {
     let artist = '';
-    for (let i = 3; i < process.argv.length; i++){
-        artist = artist.concat(process.argv[i] + ' ')
+    for (let i = 3; i < process.argv.length; i++) {
+        if (i > 3) {
+            artist = artist.concat('%20')
+        }
+        artist = artist.concat(process.argv[i])
     }
     let queryUrl = `https://rest.bandsintown.com/artists/${artist}/events?app_id=codingbootcamp`
-    console.log(queryUrl)
+
+    request(queryUrl, function (error, response, body) {
+        let bandInfo = JSON.parse(body);
+        let event = {};
+        if (!bandInfo[0]) {
+            console.log("No upcoming Events")
+            return;
+        } else {
+            for (let i = 0; i < bandInfo.length; i++) {
+                event = bandInfo[i]
+                console.log(`Venue: ${event.venue.name}`)
+                console.log(`Location: ${event.venue.city}, ${event.venue.region}`)
+                console.log(`Date: ${moment(event.datetime).format("MM/DD/YYYY")} \n`)
+            }
+        }
+    });
+} else if (firstInput === "spotify-this-song") {
+    let songName = '';
+    for (let i = 3; i < process.argv.length; i++) {
+        if (i > 3) {
+            songName = songName.concat(' ')
+        }
+        songName = songName.concat(process.argv[i])
+       
+    }
+
+    console.log(songName)
+
+    spotify.search({
+        type: 'track',
+        query: songName
+        // limit: 1
+    }, function (err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        } else {
+            let song = data.tracks.items[0]
+            let artists = [];
+            for (let i = 0; i < song.artists.length; i++) {
+                artists.push(song.artists[i].external_urls.name)
+            }
+
+        }
+    })
 }
