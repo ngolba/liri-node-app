@@ -1,16 +1,9 @@
 require("dotenv").config();
-
 let keys = require("./keys");
-
 let moment = require('moment');
-
-
 let request = require('request');
-
 let Spotify = require('node-spotify-api');
-
 let spotify = new Spotify(keys.spotify);
-
 let firstInput = process.argv[2];
 
 
