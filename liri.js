@@ -42,19 +42,7 @@ if (firstInput === "concert-this") {
 } else if (firstInput === "spotify-this-song") {
     let songName = '';
     if (process.argv.length < 4) {
-        spotify
-            .request('https://api.spotify.com/v1/tracks/7yCPwWs66K8Ba5lFuU2bcx')
-            .then(function (data) {
-                let song = data[0]
-                let artistString = [];
-                for (let i = 0; i < song.artists.length; i++) {
-                    artistString.push(song.artists[i].name + '  ')
-                }
-                console.log(`Artist(s): ${artistString}`)
-                console.log(`Song Name: ${song.name}`)
-                console.log(`Preview: ${song.preview_url}`)
-                console.log(`Album: ${song.album.name}`)
-            })
+        songName = "The+Sign"
     } else {
         for (let i = 3; i < process.argv.length; i++) {
             if (i > 3) {
@@ -62,25 +50,25 @@ if (firstInput === "concert-this") {
             }
             songName = songName.concat(process.argv[i])
         }
-        spotify.search({
-            type: 'track',
-            query: songName
-            // limit: 1
-        }, function (err, data) {
-            if (err) {
-                return console.log('Error occurred: ' + err);
-            } else {
-                let song = data.tracks.items[0]
-                let artistString = [];
-                for (let i = 0; i < song.artists.length; i++) {
-                    artistString.push(song.artists[i].name + '  ')
-                }
-
-                console.log(`Artist(s): ${artistString}`)
-                console.log(`Song Name: ${song.name}`)
-                console.log(`Preview: ${song.preview_url}`)
-                console.log(`Album: ${song.album.name}`)
-            }
-        })
     }
+    spotify.search({
+        type: 'track',
+        query: songName
+        // limit: 1
+    }, function (err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        } else {
+            let song = data.tracks.items[0]
+            let artistString = [];
+            for (let i = 0; i < song.artists.length; i++) {
+                artistString.push(song.artists[i].name + '  ')
+            }
+
+            console.log(`Artist(s): ${artistString}`)
+            console.log(`Song Name: ${song.name}`)
+            console.log(`Preview: ${song.preview_url}`)
+            console.log(`Album: ${song.album.name}`)
+        }
+    })
 } else if (firstInput === "movie-this") {}
