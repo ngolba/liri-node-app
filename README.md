@@ -24,3 +24,8 @@ Then enter either
   * `do-what-it-says` to read one of the previous three commands from the `random.txt` file.
   
 The results will be logged to the console, as well as to the `log.txt` file.
+
+
+[![Demo Video](https://img.youtube.com/vi/ZmtsRfv428I/0.jpg)](https://www.youtube.com/watch?v=ZmtsRfv428I)
+
+
