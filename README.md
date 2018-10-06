@@ -25,6 +25,8 @@ Then enter either
   
 The results will be logged to the console, as well as to the `log.txt` file.
 
+![Screenshot](https://user-images.githubusercontent.com/38729212/46566151-2cd5a680-c8e7-11e8-8a49-2056b469f79b.PNG)
+
 
 [![Demo Video](https://img.youtube.com/vi/ZmtsRfv428I/0.jpg)](https://www.youtube.com/watch?v=ZmtsRfv428I)
 
