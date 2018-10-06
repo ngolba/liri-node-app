@@ -1,9 +1,9 @@
 # liri-node-app
 
 Goal -- Create a node application which can: 
-  1) Recieve a band name and output details of their upcoming events
-  2) Recieve a song name and output Spotify details
-  3) Recieve a movie name and output relevant information
+  1) Receive a band name and output details of their upcoming events
+  2) Receive a song name and output Spotify details
+  3) Receive a movie name and output relevant information
   4) Read an input string from a `.txt` file and perform steps 1, 2, or 3
   5) Log the outputs to a `.txt` file
   
