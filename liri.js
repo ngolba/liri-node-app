@@ -12,7 +12,7 @@ const acceptableCommands = ["concert-this", "spotify-this-song", "movie-this", "
 
 // Log initial input to log.txt ////
 let cmdLineText = '';
-for (let i = 2; i < process.argv.length; i++){
+for (let i = 2; i < process.argv.length; i++) {
     cmdLineText += `${process.argv[i]} `
 }
 fs.appendFile('log.txt', `${cmdLineText}\n\n`, 'utf8', () => {});
@@ -21,7 +21,7 @@ fs.appendFile('log.txt', `${cmdLineText}\n\n`, 'utf8', () => {});
 // Console.log data and store to log.txt //
 const logAndPrintData = (data) => {
     console.log(data)
-    fs.appendFile('log.txt', (data +  '\n'), 'utf8', () => {});
+    fs.appendFile('log.txt', (data + '\n'), 'utf8', () => {});
 }
 /////////////////////////////////////////
 
@@ -31,9 +31,7 @@ const processInput = (divider, input, minLength) => {
     if (input.length === (minLength + 1)) {
         return outputString;
     } else {
-        for (let i = (minLength + 1); i < input.length; i++) {
-            outputString += (divider + input[i]);
-        }
+        outputString = (input.slice(3)).join(divider)
         return outputString;
     }
 }
@@ -102,6 +100,7 @@ const spotifyThis = (input, minLength) => {
                 limit: 1
             })
             .then(function (response) {
+                console.log(response)
                 fillData(response.tracks.items[0]);
                 logAndPrintData(`Song Name: ${songName} \nArtist(s): ${artists} \nPreview URL: ${previewUrl} \nAlbum Title: ${album} \n`);
             })
@@ -142,7 +141,7 @@ if (command === "concert-this") {
             console.log("Error")
             return;
         }
-        
+
         let fileText = (JSON.stringify(data)).replace(/["'\\]/g, '');
         let fileInputs = fileText.split(',');
         command = fileInputs[0];
