@@ -31,7 +31,7 @@ const processInput = (divider, input, minLength) => {
     if (input.length === (minLength + 1)) {
         return outputString;
     } else {
-        outputString = (input.slice(3)).join(divider)
+        outputString = (input.slice(minLength)).join(divider)
         return outputString;
     }
 }
@@ -100,7 +100,6 @@ const spotifyThis = (input, minLength) => {
                 limit: 1
             })
             .then(function (response) {
-                console.log(response)
                 fillData(response.tracks.items[0]);
                 logAndPrintData(`Song Name: ${songName} \nArtist(s): ${artists} \nPreview URL: ${previewUrl} \nAlbum Title: ${album} \n`);
             })
